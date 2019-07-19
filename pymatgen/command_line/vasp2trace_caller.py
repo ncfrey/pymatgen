@@ -10,6 +10,7 @@ import pandas as pd
 from os import path
 import os
 
+from monty.json import MSONable
 from monty.dev import requires
 from monty.os.path import which
 
@@ -84,8 +85,20 @@ class Vasp2TraceCaller:
         self.output = Vasp2TraceOutput(stdout)
 
 
-class Vasp2TraceOutput:
-    def __init__(self, vasp2trace_stdout):
+class Vasp2TraceOutput(MSONable):
+    def __init__(
+        self,
+        vasp2trace_stdout,
+        num_occ_bands=None,
+        soc=None,
+        num_symm_ops=None,
+        symm_ops=None,
+        num_max_kvec=None,
+        kvecs=None,
+        num_kvec_symm_ops=None,
+        symm_ops_in_little_cogroup=None,
+        traces=None,
+    ):
         """
         This class processes results from vasp2trace to classify material band topology and give topological invariants.
         
@@ -93,8 +106,6 @@ class Vasp2TraceOutput:
 
         Args:
             vasp2trace_stdout (txt file): stdout from running vasp2trace.
-
-        Parameters:
             num_occ_bands (int): Number of occupied bands.
             soc (int): 0: no spin-orbit, 1: yes spin-orbit
             num_symm_ops (int): Number of symmetry operations.
@@ -103,11 +114,22 @@ class Vasp2TraceOutput:
             kvecs (list): Each row is a k-vector.
             num_kvec_symm_ops (dict): {kvec_index: number of symm operations in the little cogroup of the kvec}. 
             symm_ops_in_little_cogroup (dict): {kvec_index: int indices that correspond to symm_ops}
-            traces (array): band index, band degeneracy, energy eigenval, Re eigenval, Im eigenval for each symm op in the little cogroup      
+            traces (dict): band index, band degeneracy, energy eigenval, Re eigenval, Im eigenval for each symm op in the little cogroup 
             
         """
 
-        self.vasp2trace_stdout = vasp2trace_stdout
+        self._vasp2trace_stdout = vasp2trace_stdout
+
+        self.num_occ_bands = num_occ_bands
+        self.soc = soc
+        self.num_symm_ops = num_symm_ops
+        self.symm_ops = symm_ops
+        self.num_max_kvec = num_max_kvec
+        self.kvecs = kvecs
+        self.num_kvec_symm_ops = num_kvec_symm_ops
+        self.symm_ops_in_little_cogroup = symm_ops_in_little_cogroup
+        self.traces = traces
+
         self._parse_stdout(vasp2trace_stdout)
 
     def _parse_stdout(self, vasp2trace_stdout):
