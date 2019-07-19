@@ -143,7 +143,9 @@ class Vasp2TraceOutput(MSONable):
             num_symm_ops = int(lines[2])
             symm_ops = np.loadtxt(lines[3 : 3 + num_symm_ops])
             num_max_kvec = int(lines[3 + num_symm_ops])
-            kvecs = np.loadtxt(lines[4 + num_symm_ops : 8 + num_symm_ops])
+            kvecs = np.loadtxt(
+                lines[4 + num_symm_ops : 4 + num_symm_ops + num_max_kvec]
+            )
 
             # Dicts with kvec index as keys
             num_kvec_symm_ops = {}

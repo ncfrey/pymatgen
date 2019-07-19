@@ -36,6 +36,19 @@ class Vasp2TraceCallerTest(unittest.TestCase):
         self.assertEqual(num_kvec_symm_ops[0], 12)
         self.assertEqual(len(traces), 4)
 
+        v2to = Vasp2TraceOutput(test_dir + "/Ba3Ca1O9Ru2.txt")
+        nob = v2to.num_occ_bands
+        num_symm_ops = v2to.num_symm_ops
+        symm_ops = v2to.symm_ops
+        num_max_kvec = v2to.num_max_kvec
+        kvecs = v2to.kvecs
+        num_kvec_symm_ops = v2to.num_kvec_symm_ops
+        symm_ops_in_little_cogroup = v2to.symm_ops_in_little_cogroup
+        traces = v2to.traces
+
+        self.assertEqual(num_max_kvec, 8)
+        self.assertEqual(len(traces), 8)
+
 
 if __name__ == "__main__":
     unittest.main()
