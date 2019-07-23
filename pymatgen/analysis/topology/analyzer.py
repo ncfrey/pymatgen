@@ -33,7 +33,7 @@ __date__ = "July 2019"
 
 
 class BandTopologyAnalyzer:
-    def __init__(self, input_dir='input', surface=lambda t1, t2: [t1, t2, 0]):
+    def __init__(self, input_dir="input", surface=lambda t1, t2: [t1, t2, 0]):
         """A class for analyzing band structure topology and diagnosing non-trivial topological phases.
 
         Create a z2pack.fp.System instance for vasp and Wannier90 that points to inputs and allows for dynamic calling of vasp.
@@ -67,17 +67,23 @@ class BandTopologyAnalyzer:
         self.surface = surface
 
         # Define input file locations
-        input_files = ['CHGCAR', 'INCAR', 'POSCAR', 'POTCAR', 'wannier90.win']
-        input_files = [input_dir + '/' + s for s in input_files]
+        input_files = ["CHGCAR", "INCAR", "POSCAR", "POTCAR", "wannier90.win"]
+        input_files = [input_dir + "/" + s for s in input_files]
 
         # Create k-point inputs for VASP
         kpt_fct = z2pack.fp.kpoint.vasp
 
-        system = z2pack.fp.System(input_files=input_files, kpt_fct=kpt_fct, kpt_path='KPOINTS', command='srun vasp_std >& log', mmn_path='wannier90.mmn')
+        system = z2pack.fp.System(
+            input_files=input_files,
+            kpt_fct=kpt_fct,
+            kpt_path="KPOINTS",
+            command="srun vasp_std >& log",
+            mmn_path="wannier90.mmn",
+        )
 
         self.system = system
 
-     def run(self, z2_settings={}):
+    def run(self, z2_settings=None):
         """Calculate Wannier charge centers on the BZ surface.
 
         Args:
@@ -89,14 +95,16 @@ class BandTopologyAnalyzer:
         surface = self.surface
 
         # z2 calculation defaults
-        z2d = {'pos_tol'=0.01,  # change in Wannier charge center pos
-            'gap_tol'=0.3,  # Limit for closeness of lines on surface
-            'move_tol'=0.3,  # Movement of WCC between neighbor lines
-            'num_lines'=11,  # Min num of lines to calculate
-            'min_neighbour_dist'=0.01,  # Min dist between lines
-            'iterator'=range(8, 27, 2), # Num of kpts to iterate over
-            'load'=True,  # Start from most recent calc 
-            'save_file'='z2run.json'}  # Serialize results  
+        z2d = {
+            "pos_tol": 0.01,  # change in Wannier charge center pos
+            "gap_tol": 0.3,  # Limit for closeness of lines on surface
+            "move_tol": 0.3,  # Movement of WCC between neighbor lines
+            "num_lines": 11,  # Min num of lines to calculate
+            "min_neighbour_dist": 0.01,  # Min dist between lines
+            "iterator": range(8, 27, 2),  # Num of kpts to iterate over
+            "load": True,  # Start from most recent calc
+            "save_file": "z2run.json",
+        }  # Serialize results
 
         # User defined setting updates to defaults
         if z2_settings:
@@ -105,7 +113,17 @@ class BandTopologyAnalyzer:
                 z2d.update(d)
 
         # Calculate WCC on the Brillouin zone surface.
-        result = z2pack.surface.run(system=system, surface=surface, pos_tol=z2d['pos_tol'], gap_tol=z2d['gap_tol'], move_tol=z2d['move_tol'], num_lines=z2d['num_lines'], min_neighbour_dist=z2d['min_neighbour_dist'], iterator=z2d['iterator'], save_file=z2d['save_file'])
+        result = z2pack.surface.run(
+            system=system,
+            surface=surface,
+            pos_tol=z2d["pos_tol"],
+            gap_tol=z2d["gap_tol"],
+            move_tol=z2d["move_tol"],
+            num_lines=z2d["num_lines"],
+            min_neighbour_dist=z2d["min_neighbour_dist"],
+            iterator=z2d["iterator"],
+            save_file=z2d["save_file"],
+        )
 
         self.output = BandTopologyAnalyzerOutput(result, surface)
 
@@ -127,7 +145,7 @@ class BandTopologyAnalyzerOutput(MSONable):
         self.surface = surface
         self.chern_number = chern_number
         self.z2_invariant = z2_invariant
-        
+
         self._parse_result(self, result)
 
     def _parse_result(self, result, surface):
@@ -140,18 +158,5 @@ class BandTopologyAnalyzerOutput(MSONable):
         self.z2_invariant = z2_invariant
 
         # BZ surface as a vector
-        surface_vec = surface('t1', 't2')
-        self.surface = surface_vec 
-
-
-
-
-
-   
-
-
-
-
-
-
-
+        surface_vec = surface("t1", "t2")
+        self.surface = surface_vec
