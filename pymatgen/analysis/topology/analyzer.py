@@ -73,7 +73,7 @@ class BandTopologyAnalyzer:
         # Create k-point inputs for VASP
         kpt_fct = z2pack.fp.kpoint.vasp
 
-        system = z2pack.fp.System(input_files=input_files, kpt_fct=kpt_fct, kpt_path='KPOINTS', command='mpirun $VASP >& log', mmn_path='wannier90.mmn')
+        system = z2pack.fp.System(input_files=input_files, kpt_fct=kpt_fct, kpt_path='KPOINTS', command='srun $VASP >& log', mmn_path='wannier90.mmn')
 
         self.system = system
 
