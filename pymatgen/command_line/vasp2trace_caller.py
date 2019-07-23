@@ -80,15 +80,20 @@ class Vasp2TraceCaller:
 
         self._stdout = stdout
         self._stderr = stderr
+        self.output = None
 
         # Process output
-        self.output = Vasp2TraceOutput(stdout)
+        if path.isfile("trace.txt"):
+            vasp2trace_output = "trace.txt"
+            self.output = Vasp2TraceOutput(vasp2trace_output)
+        else:
+            raise FileNotFoundError()
 
 
 class Vasp2TraceOutput(MSONable):
     def __init__(
         self,
-        vasp2trace_stdout,
+        vasp2trace_output,
         num_occ_bands=None,
         soc=None,
         num_symm_ops=None,
@@ -118,7 +123,7 @@ class Vasp2TraceOutput(MSONable):
             
         """
 
-        self._vasp2trace_stdout = vasp2trace_stdout
+        self._vasp2trace_output = vasp2trace_output
 
         self.num_occ_bands = num_occ_bands
         self.soc = soc
@@ -130,11 +135,11 @@ class Vasp2TraceOutput(MSONable):
         self.symm_ops_in_little_cogroup = symm_ops_in_little_cogroup
         self.traces = traces
 
-        self._parse_stdout(vasp2trace_stdout)
+        self._parse_stdout(vasp2trace_output)
 
-    def _parse_stdout(self, vasp2trace_stdout):
+    def _parse_stdout(self, vasp2trace_output):
 
-        with open(vasp2trace_stdout, "r") as file:
+        with open(vasp2trace_output, "r") as file:
             lines = file.readlines()
 
             # Get header info
